@@ -24,7 +24,6 @@ This creates a **tamper-evident chain**, where modifying any past entry invalida
   - [Estrutura do Log](#estrutura-do-log)
   - [Verificação de Integridade](#verificação-de-integridade)
   - [Casos de Uso](#casos-de-uso)
-  - [Limitações](#limitações)
 - [English](#english)
   - [Overview](#overview)
   - [How It Works](#how-it-works)
@@ -33,7 +32,6 @@ This creates a **tamper-evident chain**, where modifying any past entry invalida
   - [Log Structure](#log-structure)
   - [Integrity Verification](#integrity-verification)
   - [Use Cases](#use-cases)
-  - [Limitations](#limitations)
 - [License](#license)
 
 ---
@@ -183,15 +181,6 @@ Essa biblioteca é útil para sistemas que exigem **auditabilidade forte**:
 
 ---
 
-## Limitações
-
-- não é um blockchain distribuído
-- depende da preservação completa da cadeia
-- não inclui assinaturas digitais
-- não resolve problemas de consenso distribuído
-
----
-
 # English
 
 ## Overview
@@ -334,15 +323,6 @@ Verification steps:
 - security event logging
 - regulatory systems
 - infrastructure event tracking
-
----
-
-## Limitations
-
-- not a distributed blockchain
-- integrity depends on full log chain storage
-- no built-in digital signatures
-- no distributed consensus
 
 ---
 
