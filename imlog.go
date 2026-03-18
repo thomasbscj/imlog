@@ -4,6 +4,7 @@ package imlog
 import (
 	"crypto/sha256"
 	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -24,10 +25,10 @@ const (
 
 
 type LogEntry struct {
-	Type      LogLevel  `json:"type"`
-	Message   string    `json:"message"`
+	Type      LogLevel `json:"type"`
+	Message   string   `json:"message"`
 	Timestamp time.Time `json:"timestamp"`
-	SHA256    [32]byte  `json:"sha256"`
+	SHA256    string   `json:"sha256"`
 }
 
 type ImLogger struct {
@@ -113,9 +114,9 @@ func (l *ImLogger) initializeLastSum() error {
 	return nil
 }
 
-func (l *ImLogger) writeHash(hash [32]byte) error {
+func (l *ImLogger) writeHash(hashBytes [32]byte) error {
 	newOffset := l.lastSumOffset + 32
-	if _, err := l.sumsFile.WriteAt(hash[:], l.lastSumOffset); err != nil {
+	if _, err := l.sumsFile.WriteAt(hashBytes[:], l.lastSumOffset); err != nil {
 		return fmt.Errorf("failed to write hash: %w", err)
 	}
 
@@ -125,7 +126,7 @@ func (l *ImLogger) writeHash(hash [32]byte) error {
 		return fmt.Errorf("failed to update offset: %w", err)
 	}
 
-	l.lastSum = hash
+	l.lastSum = hashBytes
 	l.lastSumOffset = newOffset
 
 	return nil
@@ -152,7 +153,8 @@ func (l *ImLogger) Log(level LogLevel, message string) error {
 	}
 
 	data := append(entryJSON, l.lastSum[:]...)
-	entry.SHA256 = sha256.Sum256(data)
+	hashBytes := sha256.Sum256(data)
+	entry.SHA256 = hex.EncodeToString(hashBytes[:])
 
 	completeJSON, err := json.Marshal(entry)
 	if err != nil {
@@ -167,7 +169,7 @@ func (l *ImLogger) Log(level LogLevel, message string) error {
 		return fmt.Errorf("failed to write newline: %w", err)
 	}
 
-	if err := l.writeHash(entry.SHA256); err != nil {
+	if err := l.writeHash(hashBytes); err != nil {
 		return err
 	}
 
@@ -214,4 +216,8 @@ func (l *ImLogger) Close() error {
 
 func (l *ImLogger) GetLastHash() [32]byte {
 	return l.lastSum
+}
+
+func (l *ImLogger) GetLastHashHex() string {
+	return hex.EncodeToString(l.lastSum[:])
 }
